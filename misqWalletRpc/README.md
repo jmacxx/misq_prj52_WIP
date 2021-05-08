@@ -6,6 +6,26 @@ Java library containing an interface to multiple different wallet implementation
 At the moment, this proof-of-concept only uses bitcoind RPC.
 It will be extended to support litecoind RPC, elements RPC and monero RPC.
 
+The wallet interface looks like this:
+
+    // a generic wallet interface, supporting multiple different chains
+    public interface Wallet {
+
+        interface Listener {
+            void onNewChainHeight(Long height);
+            void onBalanceChanged(String balance);
+        }
+
+        CompletableFuture<Long> getChainHeight();
+        CompletableFuture<String> getFreshReceivingAddress();
+        CompletableFuture<String> getBalance();
+        CompletableFuture<String> sendToAddress(String address, String amount, String memo);
+
+        Wallet addListener(Listener listener);
+    }
+
+
+
 The project includes an example 'Kit' app that uses the wallet to perform various functions: check balance, get chain height, get a receiving address, send funds.
 
 
