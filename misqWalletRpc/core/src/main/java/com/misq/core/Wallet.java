@@ -16,5 +16,6 @@ public interface Wallet {
     CompletableFuture<String> sendToAddress(String address, String amount, String memo);
 
     Wallet addListener(Listener listener);
-    String toString();
+    String getTokenName();      // e.g. selected wallet token BTC, LTC, XMR
+    String toString();          // wallet impl name e.g. bitcoind, litecoind, monerod
 }

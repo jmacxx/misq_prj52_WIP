@@ -1,4 +1,4 @@
-package com.misq.core.rpc;
+package com.misq.core.bitcoind;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonPropertyOrder({"address", "amount", "confirmations", "label", "txids"})
-public class RawDtoAddressBalanceBitcoind {
+public class RawDtoAddressBalance {
     @JsonProperty("address")
     private String address;
     @JsonProperty("amount")

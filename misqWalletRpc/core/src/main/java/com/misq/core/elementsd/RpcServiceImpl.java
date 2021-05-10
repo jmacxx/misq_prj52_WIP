@@ -1,4 +1,4 @@
-package com.misq.core.rpc;
+package com.misq.core.elementsd;
 
 import com.misq.utils.Coin;
 
@@ -6,24 +6,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-public class RpcServiceElementsd extends RpcService {
+public class RpcServiceImpl extends com.misq.core.RpcService {
 
-    private ElementsdClient client;
+    private RpcInterface client;
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Constructor
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    public RpcServiceElementsd(String rpcUser, String rpcPassword, String rpcHost, int rpcPort, String walletName) {
+    public RpcServiceImpl(String rpcUser, String rpcPassword, String rpcHost, int rpcPort, String walletName) {
         try {
-            client = ElementsdClient.builder()
+            client = RpcInterface.builder()
                     .rpcHost(rpcHost)
                     .rpcPort(rpcPort)
                     .rpcUser(rpcUser)
                     .rpcPassword(rpcPassword)
                     .walletName(walletName)
                     .build();
-            CompletableFuture.supplyAsync(() -> client.loadWallet(walletName));
+            client.loadWallet(walletName); // blocking call
         } catch (Throwable e) {
             System.out.println(e);
         }
@@ -52,8 +52,8 @@ public class RpcServiceElementsd extends RpcService {
     @Override
     public CompletableFuture<String> getFreshReceivingAddress(String label) {
         final CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
-            List<RawDtoAddressBalanceElementsd> addressBalanceList = client.listReceivedByAddress(0, true);
-            for (RawDtoAddressBalanceElementsd info : addressBalanceList) {
+            List<RawDtoAddressBalance> addressBalanceList = client.listReceivedByAddress(0, true);
+            for (RawDtoAddressBalance info : addressBalanceList) {
                 if (Coin.parseCoin(info.getAmount()).equals(Coin.ZERO)) {
                     return info.getAddress();
                 }

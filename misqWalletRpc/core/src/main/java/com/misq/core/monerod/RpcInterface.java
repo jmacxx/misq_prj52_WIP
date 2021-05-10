@@ -1,4 +1,4 @@
-package com.misq.core.rpc;
+package com.misq.core.monerod;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,29 +11,23 @@ import java.util.*;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.googlecode.jsonrpc4j.JsonRpcHttpClient;
-import com.googlecode.jsonrpc4j.JsonRpcMethod;
-import com.googlecode.jsonrpc4j.ProxyUtil;
-import com.googlecode.jsonrpc4j.RequestIDGenerator;
+import com.googlecode.jsonrpc4j.*;
 
-public interface BitcoindClient {
-    @JsonRpcMethod("loadwallet")
-    String loadWallet(String walletName);
+public interface RpcInterface {
+    @JsonRpcMethod("open_wallet")
+    void openWallet(@JsonRpcParam(value="filename") String filename, @JsonRpcParam(value="password") String password);
 
-    @JsonRpcMethod("getblockcount")
-    Long getBlockCount();
+    @JsonRpcMethod("close_wallet")
+    void closeWallet();
 
-    @JsonRpcMethod("getbalance")
-    String getBalance();
+    @JsonRpcMethod("get_height")
+    Map<String, Long> getBlockCount();
 
-    @JsonRpcMethod("getnewaddress")
-    String getNewAddress(String label);
+    @JsonRpcMethod("get_balance")
+    RawDtoBalance getBalance();
 
-    @JsonRpcMethod("sendtoaddress")
-    String sendToAddress(String address, String amount, String memo);
-
-    @JsonRpcMethod("listreceivedbyaddress")
-    List<RawDtoAddressBalanceBitcoind> listReceivedByAddress(int minConf, boolean includeEmpty);
+    @JsonRpcMethod("create_address")
+    RawDtoAddress createAddress(@JsonRpcParam(value="account_index") Long accountIndex, @JsonRpcParam(value="label") String label);
 
     static Builder builder() {
         return new Builder();
@@ -73,7 +67,7 @@ public interface BitcoindClient {
             return this;
         }
 
-        public BitcoindClient build() throws MalformedURLException {
+        public RpcInterface build() throws MalformedURLException {
             var userPass = checkNotNull(rpcUser, "rpcUser not set") +
                     ":" + checkNotNull(rpcPassword, "rpcPassword not set");
 
@@ -84,10 +78,10 @@ public interface BitcoindClient {
                     new ObjectMapper()
                             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
                             .configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE, true),
-                    new URL("http", rpcHost, rpcPort, "/wallet/" + walletName, urlStreamHandler),
+                    new URL("http", rpcHost, rpcPort, "/json_rpc", urlStreamHandler),
                     headers);
             Optional.ofNullable(requestIDGenerator).ifPresent(httpClient::setRequestIDGenerator);
-            return ProxyUtil.createClientProxy(getClass().getClassLoader(), BitcoindClient.class, httpClient);
+            return ProxyUtil.createClientProxy(getClass().getClassLoader(), RpcInterface.class, httpClient);
         }
     }
 }

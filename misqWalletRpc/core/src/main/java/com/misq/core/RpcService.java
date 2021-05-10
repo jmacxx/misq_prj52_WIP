@@ -1,4 +1,4 @@
-package com.misq.core.rpc;
+package com.misq.core;
 
 import java.util.concurrent.CompletableFuture;
 

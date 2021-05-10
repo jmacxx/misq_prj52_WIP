@@ -1,4 +1,4 @@
-package com.misq.core.rpc;
+package com.misq.core.elementsd;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,7 +16,7 @@ import com.googlecode.jsonrpc4j.JsonRpcMethod;
 import com.googlecode.jsonrpc4j.ProxyUtil;
 import com.googlecode.jsonrpc4j.RequestIDGenerator;
 
-public interface ElementsdClient {
+public interface RpcInterface {
     @JsonRpcMethod("loadwallet")
     String loadWallet(String walletName);
 
@@ -33,7 +33,7 @@ public interface ElementsdClient {
     String sendToAddress(String address, String amount, String memo);
 
     @JsonRpcMethod("listreceivedbyaddress")
-    List<RawDtoAddressBalanceElementsd> listReceivedByAddress(int minConf, boolean includeEmpty);
+    List<RawDtoAddressBalance> listReceivedByAddress(int minConf, boolean includeEmpty);
 
     static Builder builder() {
         return new Builder();
@@ -73,7 +73,7 @@ public interface ElementsdClient {
             return this;
         }
 
-        public ElementsdClient build() throws MalformedURLException {
+        public RpcInterface build() throws MalformedURLException {
             var userPass = checkNotNull(rpcUser, "rpcUser not set") +
                     ":" + checkNotNull(rpcPassword, "rpcPassword not set");
 
@@ -87,7 +87,7 @@ public interface ElementsdClient {
                     new URL("http", rpcHost, rpcPort, "/wallet/" + walletName, urlStreamHandler),
                     headers);
             Optional.ofNullable(requestIDGenerator).ifPresent(httpClient::setRequestIDGenerator);
-            return ProxyUtil.createClientProxy(getClass().getClassLoader(), ElementsdClient.class, httpClient);
+            return ProxyUtil.createClientProxy(getClass().getClassLoader(), RpcInterface.class, httpClient);
         }
     }
 }

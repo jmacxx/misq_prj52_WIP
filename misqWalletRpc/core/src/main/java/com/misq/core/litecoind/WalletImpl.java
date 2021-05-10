@@ -1,6 +1,6 @@
-package com.misq.core;
+package com.misq.core.litecoind;
 
-import com.misq.core.rpc.RpcServiceElementsd;
+import com.misq.core.Wallet;
 import com.misq.utils.UserThread;
 
 import com.google.common.io.BaseEncoding;
@@ -11,16 +11,16 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
-public class WalletImplElementsd implements Wallet{
+public class WalletImpl implements Wallet {
 
     protected final Set<Listener> listeners = new HashSet<>();
-    protected final RpcServiceElementsd rpcService;
+    protected final com.misq.core.litecoind.RpcServiceImpl rpcService;
     protected Long chainHeight;
     protected String myBalance;
 
-    public WalletImplElementsd(String walletName) {
-        this.rpcService = new RpcServiceElementsd("bisqdao", "bsq", "127.0.0.1", 18884, walletName);
-        zmqThread("tcp://127.0.0.1:29999").start();
+    public WalletImpl(String walletName) {
+        this.rpcService = new RpcServiceImpl("bisqdao", "bsq", "127.0.0.1", 19443, walletName);
+        zmqThread("tcp://127.0.0.1:29332").start();
         getBalance();
     }
 
@@ -49,12 +49,11 @@ public class WalletImplElementsd implements Wallet{
     @Override
     public CompletableFuture<String> getBalance() {
         CompletableFuture<String> future = rpcService.getBalance();
-        future.handle((balance, ex) -> {
+        future.thenAccept(balance -> {
             if (!balance.equals(myBalance)) {
                 myBalance = balance;
                 listeners.forEach(e -> e.onBalanceChanged(this, balance));
             }
-            return balance;
         });
         return future;
     }
@@ -95,5 +94,8 @@ public class WalletImplElementsd implements Wallet{
     }
 
     @Override
-    public String toString() { return "elementsd"; }
+    public String getTokenName() { return "LTC"; }
+
+    @Override
+    public String toString() { return "litecoind"; }
 }

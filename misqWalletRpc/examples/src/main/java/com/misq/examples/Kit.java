@@ -13,52 +13,50 @@ public class Kit implements Wallet.Listener{
     }
     @Override
     public void onBalanceChanged(Wallet wallet, String balance) {
-        System.out.println(wallet.toString() + " ===> balance notification from wallet: " + balance);
+        System.out.println(wallet.toString() + " ===> balance notification from wallet: " + balance + " " + wallet.getTokenName());
     }
 
-    public Wallet bitcoinWallet;
-    public Wallet elementsWallet;
-
     Kit() {
-        // open wallet and do some stuff
-        bitcoinWallet = new WalletImplBitcoind("test123").addListener(this);
-        elementsWallet = new WalletImplElementsd("test123").addListener(this);
+        // open wallets and do some stuff
+        Wallet bitcoinWallet = new com.misq.core.bitcoind.WalletImpl("test123").addListener(this);
+        Wallet litecoinWallet = new com.misq.core.litecoind.WalletImpl("test123").addListener(this);
+        Wallet elementsWallet = new com.misq.core.elementsd.WalletImpl("test123").addListener(this);
+        Wallet moneroWallet = new com.misq.core.monerod.WalletImpl("test123", "test123").addListener(this);
+        doWalletThings(bitcoinWallet);
+        doWalletThings(litecoinWallet);
+        doWalletThings(elementsWallet);
+        doWalletThings(moneroWallet);
     }
 
     void doWalletThings(Wallet wallet) {
         System.out.println(wallet.toString() + " doingWalletThings");
-
         wallet.getChainHeight().thenAccept(height -> {
             System.out.println(wallet.toString() + " read chain height: " + height);
         });
 
         wallet.getBalance().thenAccept(balance -> {
-            System.out.println(wallet.toString() + " read balance: " + balance);
+            System.out.println(wallet.toString() + " read balance: " + balance + " " + wallet.getTokenName());
         });
 
-        // example of chaining: get receiving address then send funds to the address
         wallet.getFreshReceivingAddress()
                 .whenComplete((msg, ex) -> {
                     System.out.println(wallet.toString() + " receving address is: " + msg);
                 })
                 .thenCompose(address -> wallet.sendToAddress((address), "0.5", "test"))
-                    .whenComplete((msg, ex) -> {
-                        System.out.println(wallet.toString() + " sending 0.5 BTC...");
-                        if (ex != null) {
-                            System.out.println("EXCEPTION: " + ex.toString());
-                        } else {
-                            System.out.println(wallet.toString() + " sent funds to my receiving address, txId: " + msg);
-                        }
-                    });
+                .whenComplete((msg, ex) -> {
+                    System.out.println(wallet.toString() + " sending 0.5 " + wallet.getTokenName() + "...");
+                    if (ex != null) {
+                        System.out.println("EXCEPTION: " + ex.toString());
+                    } else {
+                        System.out.println(wallet.toString() + " sent funds to my receiving address, txId: " + msg);
+                    }
+                });
+        sleep(5);
     }
 
     public static void main(String[] args) {
         System.out.println("starting..");
         Kit kit = new Kit();
-        sleep(1);
-        kit.doWalletThings(kit.bitcoinWallet);
-        sleep(5);
-        kit.doWalletThings(kit.elementsWallet);
         while (true) {
             sleep(60);
         }

@@ -1,6 +1,6 @@
-package com.misq.core;
+package com.misq.core.bitcoind;
 
-import com.misq.core.rpc.RpcServiceBitcoind;
+import com.misq.core.Wallet;
 import com.misq.utils.UserThread;
 
 import com.google.common.io.BaseEncoding;
@@ -11,15 +11,15 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
-public class WalletImplBitcoind implements Wallet{
+public class WalletImpl implements Wallet {
 
     protected final Set<Listener> listeners = new HashSet<>();
-    protected final RpcServiceBitcoind rpcService;
+    protected final RpcServiceImpl rpcService;
     protected Long chainHeight;
     protected String myBalance;
 
-    public WalletImplBitcoind(String walletName) {
-        this.rpcService = new RpcServiceBitcoind("bisqdao", "bsq", "127.0.0.1", 18443, walletName);
+    public WalletImpl(String walletName) {
+        this.rpcService = new RpcServiceImpl("bisqdao", "bsq", "127.0.0.1", 18443, walletName);
         zmqThread("tcp://127.0.0.1:28332").start();
         getBalance();
     }
@@ -92,6 +92,9 @@ public class WalletImplBitcoind implements Wallet{
             }
         };
     }
+
+    @Override
+    public String getTokenName() { return "BTC"; }
 
     @Override
     public String toString() { return "bitcoind"; }
