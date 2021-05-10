@@ -3,8 +3,8 @@
 
 Java library containing an interface to multiple different wallet implementations.
 
-At the moment, this proof-of-concept only uses bitcoind RPC.
-It will be extended to support litecoind RPC, elements RPC and monero RPC.
+At the moment, this proof-of-concept has support for bitcoind and elementsd RPC.
+It will be extended to support litecoind RPC, and monero RPC.
 
 The wallet interface looks like this:
 
