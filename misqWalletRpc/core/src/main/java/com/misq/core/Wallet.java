@@ -6,8 +6,8 @@ import java.util.concurrent.CompletableFuture;
 public interface Wallet {
 
     interface Listener {
-        void onNewChainHeight(Long height);
-        void onBalanceChanged(String balance);
+        void onNewChainHeight(Wallet wallet, Long height);
+        void onBalanceChanged(Wallet wallet, String balance);
     }
 
     CompletableFuture<Long> getChainHeight();
@@ -16,4 +16,5 @@ public interface Wallet {
     CompletableFuture<String> sendToAddress(String address, String amount, String memo);
 
     Wallet addListener(Listener listener);
+    String toString();
 }

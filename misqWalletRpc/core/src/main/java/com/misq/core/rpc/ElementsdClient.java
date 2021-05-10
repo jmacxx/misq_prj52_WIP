@@ -16,7 +16,7 @@ import com.googlecode.jsonrpc4j.JsonRpcMethod;
 import com.googlecode.jsonrpc4j.ProxyUtil;
 import com.googlecode.jsonrpc4j.RequestIDGenerator;
 
-public interface BitcoindClient {
+public interface ElementsdClient {
     @JsonRpcMethod("loadwallet")
     String loadWallet(String walletName);
 
@@ -24,7 +24,7 @@ public interface BitcoindClient {
     Long getBlockCount();
 
     @JsonRpcMethod("getbalance")
-    String getBalance();
+    Map<String, String> getBalance();
 
     @JsonRpcMethod("getnewaddress")
     String getNewAddress(String label);
@@ -33,7 +33,7 @@ public interface BitcoindClient {
     String sendToAddress(String address, String amount, String memo);
 
     @JsonRpcMethod("listreceivedbyaddress")
-    List<RawDtoAddressBalanceBitcoind> listReceivedByAddress(int minConf, boolean includeEmpty);
+    List<RawDtoAddressBalanceElementsd> listReceivedByAddress(int minConf, boolean includeEmpty);
 
     static Builder builder() {
         return new Builder();
@@ -73,7 +73,7 @@ public interface BitcoindClient {
             return this;
         }
 
-        public BitcoindClient build() throws MalformedURLException {
+        public ElementsdClient build() throws MalformedURLException {
             var userPass = checkNotNull(rpcUser, "rpcUser not set") +
                     ":" + checkNotNull(rpcPassword, "rpcPassword not set");
 
@@ -87,7 +87,7 @@ public interface BitcoindClient {
                     new URL("http", rpcHost, rpcPort, "/wallet/" + walletName, urlStreamHandler),
                     headers);
             Optional.ofNullable(requestIDGenerator).ifPresent(httpClient::setRequestIDGenerator);
-            return ProxyUtil.createClientProxy(getClass().getClassLoader(), BitcoindClient.class, httpClient);
+            return ProxyUtil.createClientProxy(getClass().getClassLoader(), ElementsdClient.class, httpClient);
         }
     }
 }

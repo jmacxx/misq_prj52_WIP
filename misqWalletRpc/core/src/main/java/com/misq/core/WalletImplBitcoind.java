@@ -1,6 +1,6 @@
 package com.misq.core;
 
-import com.misq.core.rpc.RpcService;
+import com.misq.core.rpc.RpcServiceBitcoind;
 import com.misq.utils.UserThread;
 
 import com.google.common.io.BaseEncoding;
@@ -11,15 +11,15 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
-public class WalletImplBitcoinCore implements Wallet{
+public class WalletImplBitcoind implements Wallet{
 
     protected final Set<Listener> listeners = new HashSet<>();
-    protected final RpcService rpcService;
+    protected final RpcServiceBitcoind rpcService;
     protected Long chainHeight;
     protected String myBalance;
 
-    public WalletImplBitcoinCore(String walletName) {
-        this.rpcService = new RpcService("bisqdao", "bsq", "127.0.0.1", 18443, walletName);
+    public WalletImplBitcoind(String walletName) {
+        this.rpcService = new RpcServiceBitcoind("bisqdao", "bsq", "127.0.0.1", 18443, walletName);
         zmqThread("tcp://127.0.0.1:28332").start();
         getBalance();
     }
@@ -30,7 +30,7 @@ public class WalletImplBitcoinCore implements Wallet{
         future.thenAccept(height -> {
             if (height != this.chainHeight) {
                 this.chainHeight = height;
-                listeners.forEach(e -> e.onNewChainHeight(height));
+                listeners.forEach(e -> e.onNewChainHeight(this, height));
             }
         });
         return future;
@@ -52,7 +52,7 @@ public class WalletImplBitcoinCore implements Wallet{
         future.thenAccept(balance -> {
             if (!balance.equals(myBalance)) {
                 myBalance = balance;
-                listeners.forEach(e -> e.onBalanceChanged(balance));
+                listeners.forEach(e -> e.onBalanceChanged(this, balance));
             }
         });
         return future;
@@ -86,10 +86,13 @@ public class WalletImplBitcoinCore implements Wallet{
                     UserThread.execute(() -> {
                         getChainHeight();
                         getBalance();
-                        System.out.println("Received ZMQ update"); //: [" + hexString + "]");
+                        System.out.println(endpoint + " received ZMQ update"); //: [" + hexString + "]");
                     });
                 }
             }
         };
     }
+
+    @Override
+    public String toString() { return "bitcoind"; }
 }

@@ -15,11 +15,11 @@ import lombok.NoArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonPropertyOrder({"address", "amount", "confirmations", "label", "txids"})
-public class RawDtoAddressBalance {
+public class RawDtoAddressBalanceBitcoind {
     @JsonProperty("address")
     private String address;
     @JsonProperty("amount")
-    private String amount;
+    String amount;
     @JsonProperty("confirmations")
     private Integer confirmations;
     @JsonProperty("label")
