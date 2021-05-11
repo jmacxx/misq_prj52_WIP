@@ -1,5 +1,7 @@
 package com.misq.core.monerod;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class RpcServiceImpl extends com.misq.core.RpcService {
@@ -43,7 +45,7 @@ public class RpcServiceImpl extends com.misq.core.RpcService {
     @Override
     public CompletableFuture<String> getBalance() {
         final CompletableFuture<String> future = CompletableFuture
-                .supplyAsync(() -> client.getBalance().getBalance())
+                .supplyAsync(() -> convertPiconeroToXmr(client.getBalance().getBalance()))
                 .handle((msg, ex) -> {
                     if (ex != null) {
                         System.out.println(ex.toString());
@@ -73,8 +75,55 @@ public class RpcServiceImpl extends com.misq.core.RpcService {
     @Override
     public CompletableFuture<String> sendToAddress(String address, String amount, String memo) {
         final CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
-            return "NOT_IMPLEMENTED";
+            RawDtoTransfer e = new RawDtoTransfer();
+            e.setAddress(address);
+            e.setAmount(convertXmrToPiconero(amount));
+            List<RawDtoTransfer> x = new ArrayList<>();
+            x.add(e);
+            RawDtoTransferResult result = client.transfer(x);
+            return result.getTxHash();
         });
         return future;
     }
+
+    private static String convertXmrToPiconero(String xmrAmount) {
+        // input is in whole XMR (including decimal place).. convert to XMR atomic units (piconero)
+        String[] tokens = xmrAmount.split("\\.");
+        String xmr = "";
+        String piconero = "";
+        if (tokens.length > 0) {
+            xmr = tokens[0];
+            if (xmr.equalsIgnoreCase("0"))
+                xmr = "";
+        }
+        if (tokens.length > 1) {
+            piconero = tokens[1];
+            // ensure there are 12 zeros after the decimal place
+            while (piconero.length() < 12) {
+                piconero = piconero + "0";
+            }
+        }
+        return xmr + piconero;
+    }
+
+    private static String convertPiconeroToXmr(String input) {
+        // input is in atomic units (piconero)
+        String xmr = "0";
+        String piconero = "";
+        if (input.length() > 12) {
+            // more than zero before the decimal
+            xmr = input.substring(0, input.length()-12);
+            piconero = input.substring(input.length()-12);
+            return xmr + "." + piconero;
+        } else {
+            // zero before the decimal
+            piconero = input;
+            while (piconero.length() < 12) {
+                piconero = "0" + piconero;
+            }
+            return "0." + piconero;
+        }
+    }
+
+
 }

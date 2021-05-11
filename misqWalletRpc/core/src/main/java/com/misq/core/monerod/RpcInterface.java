@@ -29,6 +29,9 @@ public interface RpcInterface {
     @JsonRpcMethod("create_address")
     RawDtoAddress createAddress(@JsonRpcParam(value="account_index") Long accountIndex, @JsonRpcParam(value="label") String label);
 
+    @JsonRpcMethod("transfer")
+    RawDtoTransferResult transfer(@JsonRpcParam(value="destinations") List<RawDtoTransfer> destinations);
+
     static Builder builder() {
         return new Builder();
     }

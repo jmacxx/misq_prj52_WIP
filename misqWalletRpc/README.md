@@ -75,16 +75,14 @@ elementsd ===> balance notification from wallet: 0.99886528 L-BTC
 waking up
 monerod doingWalletThings
 sleeping..
-monerod ===> balance notification from wallet: 0 XMR
-monerod ===> chain height notification from wallet: 1
-monerod read chain height: 1
-monerod read balance: 0 XMR
-monerod receving address is: 86evGU2rWzZcT1GH1jybe9HFHAiVekd2oYx7TKruyyqrVY55J1GnkhbVcgFQt6gAD4b3jAXgcJ55BFqhhXPfJLsiMhjvu1d
+monerod ===> balance notification from wallet: 9.999544770000 XMR
+monerod read balance: 9.999544770000 XMR
+monerod receving address is: 78HeFKNoeYsb9GSQ3FfRQzhahDH9rkAJU8ET9juP974hMHGATjxnQFpgXZGa9gmGPM5rn8fRLUHg8UrNsm9nCpKQQ1hTA7Y
+monerod ===> chain height notification from wallet: 832200
+monerod read chain height: 832200
 monerod sending 0.5 XMR...
-monerod sent funds to my receiving address, txId: NOT_IMPLEMENTED
+monerod sent funds to my receiving address, txId: 0a970caa53cb34dc5bc94e19d7f67657a5ea06ae15912c8ebe8d06b9b6e951d5
 waking up
-sleeping..
-
 ```
 
 
