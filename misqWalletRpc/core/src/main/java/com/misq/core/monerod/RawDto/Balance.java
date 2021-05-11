@@ -1,4 +1,4 @@
-package com.misq.core.monerod;
+package com.misq.core.monerod.RawDto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -13,7 +13,8 @@ import lombok.NoArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonPropertyOrder({"balance"})
-public class RawDtoBalance {
+// https://www.getmonero.org/resources/developer-guides/wallet-rpc.html#get_balance
+public class Balance {
     @JsonProperty("balance")
     private String balance;
 

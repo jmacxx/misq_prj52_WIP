@@ -1,5 +1,10 @@
 package com.misq.core.monerod;
 
+import com.misq.core.monerod.RawDto.IncomingTransfersResponse;
+import com.misq.core.monerod.RawDto.IncomingTransfersDetail;
+import com.misq.core.monerod.RawDto.Transfer;
+import com.misq.core.monerod.RawDto.TransferResult;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -75,13 +80,25 @@ public class RpcServiceImpl extends com.misq.core.RpcService {
     @Override
     public CompletableFuture<String> sendToAddress(String address, String amount, String memo) {
         final CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
-            RawDtoTransfer e = new RawDtoTransfer();
+            Transfer e = new Transfer();
             e.setAddress(address);
             e.setAmount(convertXmrToPiconero(amount));
-            List<RawDtoTransfer> x = new ArrayList<>();
+            List<Transfer> x = new ArrayList<>();
             x.add(e);
-            RawDtoTransferResult result = client.transfer(x);
+            TransferResult result = client.transfer(x);
             return result.getTxHash();
+        });
+        return future;
+    }
+
+    public CompletableFuture<List<String>> getIncomingTransfers() {
+        final CompletableFuture<List<String>> future = CompletableFuture.supplyAsync(() -> {
+            IncomingTransfersResponse x = client.getIncomingTransfers("all");
+            List<String> results = new ArrayList<>();
+            for (IncomingTransfersDetail info : x.transfers) {
+                results.add(info.getTxHash());
+            }
+            return results;
         });
         return future;
     }

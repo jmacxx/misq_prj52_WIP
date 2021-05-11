@@ -12,6 +12,7 @@ import java.util.*;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.googlecode.jsonrpc4j.*;
+import com.misq.core.monerod.RawDto.*;
 
 public interface RpcInterface {
     @JsonRpcMethod("open_wallet")
@@ -23,14 +24,17 @@ public interface RpcInterface {
     @JsonRpcMethod("get_height")
     Map<String, Long> getBlockCount();
 
+    @JsonRpcMethod("incoming_transfers")
+    IncomingTransfersResponse getIncomingTransfers(@JsonRpcParam(value="transfer_type") String transferType);
+
     @JsonRpcMethod("get_balance")
-    RawDtoBalance getBalance();
+    Balance getBalance();
 
     @JsonRpcMethod("create_address")
-    RawDtoAddress createAddress(@JsonRpcParam(value="account_index") Long accountIndex, @JsonRpcParam(value="label") String label);
+    Address createAddress(@JsonRpcParam(value="account_index") Long accountIndex, @JsonRpcParam(value="label") String label);
 
     @JsonRpcMethod("transfer")
-    RawDtoTransferResult transfer(@JsonRpcParam(value="destinations") List<RawDtoTransfer> destinations);
+    TransferResult transfer(@JsonRpcParam(value="destinations") List<Transfer> destinations);
 
     static Builder builder() {
         return new Builder();

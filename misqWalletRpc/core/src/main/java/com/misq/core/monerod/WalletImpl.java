@@ -4,6 +4,7 @@ import com.misq.core.Wallet;
 import com.misq.utils.UserThread;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -30,6 +31,7 @@ public class WalletImpl implements Wallet {
                 if (!height.equals(this.chainHeight)) {
                     this.chainHeight = height;
                     listeners.forEach(e -> e.onNewChainHeight(this, height));
+                    getBalance();   // notify wallet clients if the balance has changed
                 }
             }
             return height;
@@ -57,6 +59,10 @@ public class WalletImpl implements Wallet {
             }
         });
         return future;
+    }
+
+    public CompletableFuture<List<String>> getIncomingTransfers() {
+        return rpcService.getIncomingTransfers();
     }
 
     @Override

@@ -1,7 +1,6 @@
 package com.misq.examples;
 
 import com.misq.core.*;
-
 import java.util.concurrent.*;
 
 public class Kit implements Wallet.Listener{
@@ -18,14 +17,25 @@ public class Kit implements Wallet.Listener{
 
     Kit() {
         // open wallets and do some stuff
-        //Wallet bitcoinWallet = new com.misq.core.bitcoind.WalletImpl("test123").addListener(this);
-        //Wallet litecoinWallet = new com.misq.core.litecoind.WalletImpl("test123").addListener(this);
-        //Wallet elementsWallet = new com.misq.core.elementsd.WalletImpl("test123").addListener(this);
+        Wallet bitcoinWallet = new com.misq.core.bitcoind.WalletImpl("test123").addListener(this);
+        Wallet litecoinWallet = new com.misq.core.litecoind.WalletImpl("test123").addListener(this);
+        Wallet elementsWallet = new com.misq.core.elementsd.WalletImpl("test123").addListener(this);
         Wallet moneroWallet = new com.misq.core.monerod.WalletImpl("test124", "test124").addListener(this);
-        //doWalletThings(bitcoinWallet);
-        //doWalletThings(litecoinWallet);
-        //doWalletThings(elementsWallet);
+        doWalletThings(bitcoinWallet);
+        doWalletThings(litecoinWallet);
+        doWalletThings(elementsWallet);
         doWalletThings(moneroWallet);
+
+        sleep(5);
+        // WIP .. attempt to get Tx list
+        ((com.misq.core.monerod.WalletImpl)moneroWallet).getIncomingTransfers()
+                .whenComplete((results, ex) -> {
+                    if (results != null) {
+                        for (String info : results) {
+                            System.out.println("Monero TxId: " + info);
+                        }
+                    }
+                });
     }
 
     void doWalletThings(Wallet wallet) {

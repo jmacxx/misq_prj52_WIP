@@ -1,4 +1,4 @@
-package com.misq.core.monerod;
+package com.misq.core.monerod.RawDto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -11,16 +11,17 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class RawDtoAddress {
+// https://www.getmonero.org/resources/developer-guides/wallet-rpc.html#transfer
+public class Transfer {
+    @JsonProperty("amount")
+    private String amount;
     @JsonProperty("address")
     private String address;
-    @JsonProperty("address_index")
-    private Long addressIndex;
 
-    public String getAddress() {
-        return address;
+    public void setAddress(String address) {
+        this.address = address;
     }
-    public Long getAddressIndex() {
-        return addressIndex;
+    public void setAmount(String amount) {
+        this.amount = amount;
     }
 }
