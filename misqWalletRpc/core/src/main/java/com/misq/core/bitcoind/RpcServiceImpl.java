@@ -18,7 +18,10 @@ public class RpcServiceImpl extends com.misq.core.RpcService {
                     .rpcPassword(rpcPassword)
                     .walletName(walletName)
                     .build();
-            client.loadWallet(walletName); // blocking call
+            if (!client.listWallets().contains(walletName)) {
+                System.out.println("loading wallet: " + walletName);
+                client.loadWallet(walletName); // blocking call
+            }
         } catch (Throwable e) {
             System.out.println(e);
         }

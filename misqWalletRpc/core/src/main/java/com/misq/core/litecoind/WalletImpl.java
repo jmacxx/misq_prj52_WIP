@@ -21,7 +21,6 @@ public class WalletImpl implements Wallet {
     public WalletImpl(String walletName) {
         this.rpcService = new RpcServiceImpl("bisqdao", "bsq", "127.0.0.1", 19443, walletName);
         zmqThread("tcp://127.0.0.1:29332").start();
-        getBalance();
     }
 
     @Override

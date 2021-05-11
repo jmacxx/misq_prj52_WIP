@@ -17,8 +17,11 @@ import com.googlecode.jsonrpc4j.ProxyUtil;
 import com.googlecode.jsonrpc4j.RequestIDGenerator;
 
 public interface RpcInterface {
+    @JsonRpcMethod("listwallets")
+    List<String> listWallets();
+
     @JsonRpcMethod("loadwallet")
-    String loadWallet(String walletName);
+    Object loadWallet(String walletName);
 
     @JsonRpcMethod("getblockcount")
     Long getBlockCount();
