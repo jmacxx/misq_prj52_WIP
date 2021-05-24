@@ -26,38 +26,6 @@ bitcoin-cli -regtest -rpcuser=bisqdao -rpcpassword=bsq -rpcwallet="test123" getb
 
 &nbsp;
 
-## Setting up an electrum wallet (regtest)
-
-You need to first create your wallet in bitcoin core.
-```bitcoin-cli -regtest createwallet alice2```
-
-You need to run an electrum server (such as electrum personal server or electrumx).  I run EPS; `config.ini` tells it the seed (MPK) for the wallet and the wallet name in bitcoin core:
-```python3.6 ./common.py ./config.ini```
-
-Run electrum as daemon and tell it to load the wallet.
-
-```electrum --regtest daemon
-electrum --regtest setconfig rpcport 17777
-electrum --regtest  setconfig rpcuser bisqdao
-electrum --regtest  setconfig rpcpassword bsq
-electrum --regtest daemon load_wallet -w /home/yourname/.electrum/regtest/wallets/alice
-```
-
-Once all that is running, verify RPC connectivity to bitcoind:
-```
-curl --user bisqdao --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "getblockcount", "params": [] }' -H 'content-type: text/plain;' http://127.0.0.1:18443/
-```
-Then verify RPC connectivity to electrum:
-```
-curl --data-binary '{"jsonrpc":"2.0","id":"curltext","method":"version","params":[]}' http://bisqdao:bsq@127.0.0.1:17777
-{"result": "3.3.8", "id": "curltext", "jsonrpc": "2.0"}
-
-curl --data-binary '{"jsonrpc":"2.0","id":"curltext","method":"is_synchronized","params":[]}' http://bisqdao:bsq@127.0.0.1:17777
-```
-
-
-&nbsp;
-
 
 
 ## Setting up a monerod wallet (stagenet)
