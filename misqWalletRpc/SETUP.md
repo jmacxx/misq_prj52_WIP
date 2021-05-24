@@ -1,7 +1,9 @@
 
-### misqWalletRpc
+# misqWalletRpc
 
-### Setting up a bitcoind wallet (regtest)
+&nbsp;
+
+## Setting up a bitcoind wallet (regtest)
 
 These daemons were setup to run on the same dev machine as the misqWalletRpc process.  To run them on a remote machine might need a few tweaks (see monero setup below).
 
@@ -9,7 +11,7 @@ These daemons were setup to run on the same dev machine as the misqWalletRpc pro
     litecoind -regtest -prune=0 -txindex=1 -debug=1 -peerbloomfilters=1 -server -rpcuser=bisqdao -rpcpassword=bsq -datadir=. -zmqpubhashtx=tcp://127.0.0.1:29332
 
 
-### Checking connectivity and creating/funding the wallet
+**Checking connectivity and creating/funding the wallet**
 
 ```
 bitcoin-cli -regtest -rpcuser=bisqdao -rpcpassword=bsq getversion
@@ -22,7 +24,43 @@ bitcoin-cli -regtest -rpcuser=bisqdao -rpcpassword=bsq -rpcwallet="test123" getb
 ```
 
 
-### Setting up a monerod wallet (stagenet)
+&nbsp;
+
+## Setting up an electrum wallet (regtest)
+
+You need to first create your wallet in bitcoin core.
+```bitcoin-cli -regtest createwallet alice2```
+
+You need to run an electrum server (such as electrum personal server or electrumx).  I run EPS; `config.ini` tells it the seed (MPK) for the wallet and the wallet name in bitcoin core:
+```python3.6 ./common.py ./config.ini```
+
+Run electrum as daemon and tell it to load the wallet.
+
+```electrum --regtest daemon
+electrum --regtest setconfig rpcport 17777
+electrum --regtest  setconfig rpcuser bisqdao
+electrum --regtest  setconfig rpcpassword bsq
+electrum --regtest daemon load_wallet -w /home/yourname/.electrum/regtest/wallets/alice
+```
+
+Once all that is running, verify RPC connectivity to bitcoind:
+```
+curl --user bisqdao --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "getblockcount", "params": [] }' -H 'content-type: text/plain;' http://127.0.0.1:18443/
+```
+Then verify RPC connectivity to electrum:
+```
+curl --data-binary '{"jsonrpc":"2.0","id":"curltext","method":"version","params":[]}' http://bisqdao:bsq@127.0.0.1:17777
+{"result": "3.3.8", "id": "curltext", "jsonrpc": "2.0"}
+
+curl --data-binary '{"jsonrpc":"2.0","id":"curltext","method":"is_synchronized","params":[]}' http://bisqdao:bsq@127.0.0.1:17777
+```
+
+
+&nbsp;
+
+
+
+## Setting up a monerod wallet (stagenet)
 
 I ran monerod and monero-wallet-rpc on a node machine in my LAN.
 Replace 192.168.1.111 with the address from your own setup.
@@ -33,7 +71,7 @@ monero-wallet-rpc --stagenet --daemon-login=bisqdao:bsq --rpc-bind-port 18083 -r
 ```
 
 
-### Checking connectivity and creating/funding the wallet
+**Checking connectivity and creating/funding the wallet**
 
 ```
 curl -u bisqdao:bsq --digest -X POST http://192.168.1.111:18083/json_rpc -d '{"method":"get_version"}'
@@ -53,6 +91,9 @@ curl -u bisqdao:bsq --digest -X POST http://192.168.1.111:18083/json_rpc -d '{"m
 curl -u bisqdao:bsq --digest -X POST http://192.168.1.111:18083/json_rpc -d '{"method":"get_address","params":{"account_index":0}}'
 ```
 
+
+
+&nbsp;
 
 
 
@@ -80,7 +121,7 @@ zmqpubhashtx=tcp://127.0.0.1:29999
 ```
 
 
-### Funding (peg-in) elements L-BTC for regtest
+**Funding (peg-in) elements L-BTC for regtest**
 
 Requires an already setup bitcoind regtest.
 
@@ -129,5 +170,6 @@ elements-cli -rpcuser=bisqdao -rpcpassword=bsq getbalance
 
 
 ---
+
 
 
