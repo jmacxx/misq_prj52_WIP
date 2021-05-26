@@ -36,7 +36,7 @@ public class Kit implements Wallet.Listener{
                     inputs.add(aliceUnspent.get(0));
                     inputs.add(bobUnspent.get(0));
                     List<Utxo> outputs = new ArrayList<>();
-                    outputs.add(new Utxo().initForSpending(addr, "0.1"));
+                    outputs.add(new Utxo().initForSpending(addr, "0.4999"));
                     alice.createRawTransaction(inputs, outputs).whenComplete((txHex, b) -> {
                         System.out.println(txHex);
                     });
