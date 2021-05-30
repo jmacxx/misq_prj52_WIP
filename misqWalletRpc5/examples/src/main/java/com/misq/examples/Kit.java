@@ -20,36 +20,42 @@ public class Kit implements Wallet.Listener{
 
     Kit() {
         // open wallets and do some stuff
-        Wallet bitcoinWallet = new com.misq.core.bitcoind.WalletImpl("test123").addListener(this);
-        Wallet lndWallet = new com.misq.core.lnd.WalletImpl("test123", "127.0.0.1", 10009).addListener(this);
+        Wallet bitcoinWalletAlice = new com.misq.core.bitcoind.WalletImpl("alice").addListener(this);
+        Wallet bitcoinWalletBob = new com.misq.core.bitcoind.WalletImpl("bob").addListener(this);
+        Wallet lndWallet = new com.misq.core.lnd.WalletImpl().addListener(this);
         //Wallet electrumWallet = new com.misq.core.electrumd.WalletImpl("test123").addListener(this);
         //Wallet litecoinWallet = new com.misq.core.litecoind.WalletImpl("test123").addListener(this);
         //Wallet elementsWallet = new com.misq.core.elementsd.WalletImpl("test123").addListener(this);
         //Wallet moneroWallet = new com.misq.core.monerod.WalletImpl("test124", "test124").addListener(this);
-        doWalletThings(bitcoinWallet);
-        doWalletThings(lndWallet);
-        //doWalletThings(electrumWallet);
-        //doWalletThings(litecoinWallet);
-        //doWalletThings(elementsWallet);
-        //doWalletThings(moneroWallet);
-
-        // WIP .. attempt to get Tx list
-/*        ((com.misq.core.monerod.WalletImpl)moneroWallet).getIncomingTransfers()
-                .whenComplete((results, ex) -> {
-                    if (results != null) {
-                        for (String info : results) {
-                            System.out.println("Monero TxId: " + info);
-                        }
-                    }
-                }); */
+        doWalletThings(bitcoinWalletAlice, bitcoinWalletBob);
+        doWalletThings(lndWallet, null);
+        //doWalletThings(electrumWallet, electrumWalletBob);
+        //doWalletThings(litecoinWallet, null);
+        //doWalletThings(elementsWallet, null);
+        //doWalletThings(moneroWallet, null);
     }
 
-    void doWalletThings(Wallet wallet) {
-        System.out.println(wallet.toString() + " doingWalletThings");
+    void doWalletThings(Wallet wallet, Wallet walletCounterparty) {
+        if (wallet.getCapability().contains(Wallet.Capability.SEND_AND_RECEIVE)) {
+            doSendAndReceiveTest(wallet);
+        }
+        if (wallet.getCapability().contains(Wallet.Capability.MULTISIG) && walletCounterparty != null) {
+            doTradingTest(wallet, walletCounterparty);
+        }
+        if (wallet.getCapability().contains(Wallet.Capability.LAYER_2_LN)) {
+            doLightningTest(wallet);
+        }
+        sleep(5);
+    }
+
+    void doLightningTest(Wallet wallet) {
+        // TODO
+    }
+
+    void doSendAndReceiveTest(Wallet wallet) {
         wallet.getChainHeight().thenAccept(height -> {
             System.out.println(wallet.toString() + " read chain height: " + height);
         });
-
         wallet.getBalance().thenAccept(balance -> {
             Coin balanceAsCoin = Coin.parseCoin(balance);
             String balanceToSend = balanceAsCoin.subtract(Coin.valueOf(5000)).toPlainString();
@@ -67,8 +73,27 @@ public class Kit implements Wallet.Listener{
                             System.out.println(wallet.toString() + " sent funds to my receiving address, txId: " + msg);
                         }
                     });
-            });
-        sleep(5);
+        });
+    }
+
+    void doTradingTest(Wallet alice, Wallet bob) {
+        MultisigTest multisigTest = new MultisigTest(alice, bob);
+        multisigTest.spendingFromTwoWalletsTest((com.misq.core.electrumd.WalletImpl)alice, (com.misq.core.electrumd.WalletImpl)bob);
+        try {
+            reportBalances(alice, bob);
+            multisigTest.setupMultisigKeys();
+            multisigTest.getFunding();
+            multisigTest.createMultisig();
+            multisigTest.createSignedDepositTx();
+            multisigTest.depositTxId = multisigTest.broadcastTx(multisigTest.signedDepositTx);
+            sleep(10);
+            multisigTest.createSignedPayoutTx();
+            multisigTest.payoutTxId = multisigTest.broadcastTx(multisigTest.signedPayoutTx);
+            sleep(10);
+            reportBalances(alice, bob);
+        } catch (IOException ex) {
+            System.out.println("EXCEPTION: " + ex.toString());
+        }
     }
 
     void reportBalances(Wallet alice, Wallet bob) throws IOException {
@@ -82,26 +107,6 @@ public class Kit implements Wallet.Listener{
         });
         waitForCompletionString(a, "alice");
         waitForCompletionString(b, "bob");
-    }
-
-    void setupMultisig(Wallet alice, Wallet bob) {
-        MultisigTest multisigTest = new MultisigTest(alice, bob);
-        multisigTest.spendingFromTwoWalletsTest((com.misq.core.electrumd.WalletImpl)alice, (com.misq.core.electrumd.WalletImpl)bob);
-        try {
-            /*reportBalances(alice, bob);
-            multisigTest.setupMultisigKeys();
-            multisigTest.getFunding();
-            multisigTest.createMultisig();
-            multisigTest.createSignedDepositTx();
-            multisigTest.depositTxId = multisigTest.broadcastTx(multisigTest.signedDepositTx);
-            sleep(10);
-            multisigTest.createSignedPayoutTx();
-            multisigTest.payoutTxId = multisigTest.broadcastTx(multisigTest.signedPayoutTx);
-            sleep(10); */
-            reportBalances(alice, bob);
-        } catch (IOException ex) {
-            System.out.println("EXCEPTION: " + ex.toString());
-        }
     }
 
     private static void sleep(int seconds) {

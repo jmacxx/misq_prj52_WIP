@@ -113,11 +113,16 @@ public class MultisigTest {
         String bobPriv = waitForCompletionString(bobWallet.getPrivKey(bobAddress), "bobpriv");
 
         // TODO this is a blockchain query not specific to alice wallet
-        CompletableFuture<Boolean> futureB = aliceWallet.listUnspent(depositTxId).handle((utxos,ex) -> {
-            payoutTransactionInputs = utxos;
-            return true;
-        });
-        waitForCompletion(futureB, "hello");
+        //CompletableFuture<Boolean> futureB = aliceWallet.listUnspent(depositTxId).handle((utxos,ex) -> {
+        //    payoutTransactionInputs = utxos;
+        //    return true;
+        //});
+        //waitForCompletion(futureB, "hello");
+        Utxo utxo = new Utxo();
+        utxo.txId = this.depositTxId;
+        utxo.vout = 0;
+        // TODO: electrum needs the amount and address included here, bitcoin core only requires txid and vout
+        payoutTransactionInputs.add(utxo);
 
         // bob pays the miner fee
         String spendingAmount = (Coin.parseCoin(aliceFundingAmount).add(Coin.parseCoin(bobFundingAmount).subtract(Coin.valueOf(1000)))).toPlainString(); // todo use payoutTransactionInputs.amount???

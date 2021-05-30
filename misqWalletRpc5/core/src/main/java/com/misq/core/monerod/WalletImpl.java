@@ -5,6 +5,7 @@ import com.misq.core.InterfaceDto.Utxo;
 import com.misq.core.Wallet;
 import com.misq.utils.UserThread;
 
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -21,6 +22,11 @@ public class WalletImpl implements Wallet {
     public WalletImpl(String walletName, String walletPassword) {
         rpcService = new RpcServiceImpl("bisqdao", "bsq", "192.168.1.111", 18083, walletName, walletPassword);
         notificationThread().start();
+    }
+
+    @Override
+    public CompletableFuture<String> unlock(String password) {
+        return null;    // TODO
     }
 
     @Override
@@ -138,4 +144,9 @@ public class WalletImpl implements Wallet {
 
     @Override
     public String toString() { return "monerod"; }
+
+    @Override
+    public EnumSet<Capability> getCapability() {
+        return EnumSet.of(Capability.SEND_AND_RECEIVE);
+    }
 }

@@ -3,6 +3,7 @@ package com.misq.core;
 import com.misq.core.InterfaceDto.MultisigInfo;
 import com.misq.core.InterfaceDto.Utxo;
 
+import java.util.EnumSet;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -15,6 +16,7 @@ public interface Wallet {
     }
 
     // wallet specific
+    CompletableFuture<String> unlock(String password);
     CompletableFuture<String> getBalance();
     CompletableFuture<String> getFreshReceivingAddress();
     CompletableFuture<String> sendToAddress(String address, String amount, String memo);
@@ -37,4 +39,17 @@ public interface Wallet {
     Wallet addListener(Listener listener);
     String getTokenName();      // e.g. selected wallet token BTC, LTC, XMR
     String toString();          // wallet impl name e.g. bitcoind, litecoind, monerod
+
+    public enum Capability {
+        SEND_AND_RECEIVE("send and receive"),
+        CHAINED_TX("support for chaining unconfirmed tx"),
+        MULTISIG("multisig"),
+        TOKENS("chain supports other tokens (e.g. elements)"),
+        LAYER_2_LN("layer 2 lightning network");
+        private String displayString;
+        Capability(String displayString) {
+            this.displayString = displayString;
+        }
+    }
+    EnumSet<Capability> getCapability();
 }

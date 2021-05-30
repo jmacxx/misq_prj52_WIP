@@ -29,6 +29,11 @@ public class WalletImpl implements Wallet {
     }
 
     @Override
+    public CompletableFuture<String> unlock(String password) {
+        return null;    // TODO
+    }
+
+    @Override
     public CompletableFuture<Long> getChainHeight() {
         CompletableFuture<Long> future = rpcService.requestChainHeadHeight();
         future.thenAccept(height -> {
@@ -179,4 +184,9 @@ public class WalletImpl implements Wallet {
 
     @Override
     public String toString() { return "elementsd"; }
+
+    @Override
+    public EnumSet<Capability> getCapability() {
+        return EnumSet.of(Capability.SEND_AND_RECEIVE, Capability.CHAINED_TX, Capability.MULTISIG, Capability.TOKENS);
+    }
 }

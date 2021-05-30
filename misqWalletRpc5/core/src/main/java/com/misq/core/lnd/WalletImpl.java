@@ -13,16 +13,19 @@ public class WalletImpl implements Wallet {
     protected final Set<Listener> listeners = new HashSet<>();
     protected Long chainHeight;
     protected String myBalance;
-    protected String walletName;
     private RpcServiceImpl rpcService;
 
-    public WalletImpl(String walletName, String rpcHost, int rpcPort) {
-        this.walletName = walletName;
+    public WalletImpl() {
         try {
-            this.rpcService = new RpcServiceImpl(rpcHost, rpcPort, walletName);
+            this.rpcService = new RpcServiceImpl("127.0.0.1", 10009);
         } catch (IOException ex) {
             System.out.println(ex);
         }
+    }
+
+    @Override
+    public CompletableFuture<String> unlock(String password) {
+        return null;    // TODO
     }
 
     @Override
@@ -113,6 +116,10 @@ public class WalletImpl implements Wallet {
     public String getTokenName() { return "BTC"; }
 
     @Override
-    public String toString() { return "lnd:" + this.walletName; }
+    public String toString() { return "lnd:"; }
 
+    @Override
+    public EnumSet<Capability> getCapability() {
+        return EnumSet.of(Capability.SEND_AND_RECEIVE, Capability.LAYER_2_LN);
+    }
 }

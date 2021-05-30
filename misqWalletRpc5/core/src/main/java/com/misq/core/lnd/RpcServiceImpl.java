@@ -53,7 +53,7 @@ public class RpcServiceImpl {
 
     private LightningBlockingStub blockingStub;
 
-    public RpcServiceImpl(String rpcHost, int rpcPort, String walletName) throws IOException {
+    public RpcServiceImpl(String rpcHost, int rpcPort) throws IOException {
         final String CERT_PATH = "/home/yourusernamehere/.lnd/tls.cert";
         final String MACAROON_PATH = "/home/yourusernamehere/.lnd/data/chain/bitcoin/regtest/admin.macaroon";
 
