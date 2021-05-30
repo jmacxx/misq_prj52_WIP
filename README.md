@@ -1,5 +1,9 @@
 # Misq Wallet Prototyping
 
+Link to: [Notes](https://gist.github.com/jmacxx/587ac9a59d7d060b4f9fdf37fa9cc8ef);  
+Link to: [Work log](https://gist.github.com/jmacxx/532678c5d504ec89f826027fa81096b8);  
+
+&nbsp;
 
 [misqWalletRpc](https://github.com/jmacxx/misq_prj52_WIP/tree/master/misqWalletRpc) : first iteration of wallets supporting basic balance and transfer functionality.
 
@@ -11,6 +15,6 @@
 
 [lndWalletDemo](https://github.com/jmacxx/misq_prj52_WIP/tree/master/lndWalletDemo) : simple demo of using LND GRPC API
 
-[misqWalletRpc5](https://github.com/jmacxx/misq_prj52_WIP/tree/master/misqWalletRpc5) : add LND to supported wallets
+[misqWalletRpc5](https://github.com/jmacxx/misq_prj52_WIP/tree/master/misqWalletRpc5) : add LND to supported wallets; this is the most recent stage of development for all 6 wallets.
 
 
