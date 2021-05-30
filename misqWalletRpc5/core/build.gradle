@@ -1,0 +1,91 @@
+apply plugin: 'java'
+apply plugin: 'com.google.protobuf'
+apply plugin: 'maven'
+apply plugin: 'eclipse'
+
+version = '0.1'
+archivesBaseName = 'misq-core'
+
+ext { // in alphabetical order
+    grpcVersion = '1.8.0'
+    protobufVersion = '3.6.1'
+    lombokVersion = '1.18.12'
+    javaxAnnotationVersion = '1.2'
+    jetbrainsAnnotationsVersion = '13.0'
+    jsonrpc4jVersion = '1.6.0.bisq.1'
+    jacksonVersion = '2.12.1'
+}
+
+buildscript {
+    repositories { mavenCentral() }
+    dependencies {
+        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.0' }
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    compile "commons-codec:commons-codec:1.11"
+    compile "org.jetbrains:annotations:$jetbrainsAnnotationsVersion"
+    compile 'org.bouncycastle:bcprov-jdk15to18:1.63'
+    implementation 'com.google.guava:guava:28.2-android'
+    compile("com.github.bisq-network:jsonrpc4j:$jsonrpc4jVersion") {
+        exclude(module: 'base64')
+        exclude(module: 'httpcore-nio')
+    }
+    compile "com.fasterxml.jackson.core:jackson-core:$jacksonVersion"
+    compile "com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion"
+    compile("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion") {
+        exclude(module: 'jackson-annotations')
+    }
+    compile 'com.google.protobuf:protobuf-java:3.6.1'
+    compile "io.grpc:grpc-all:${grpcVersion}"
+    runtime 'io.netty:netty-tcnative-boringssl-static:+'
+    implementation 'com.squareup.okhttp3:okhttp:3.12.8'
+    implementation 'org.slf4j:slf4j-api:1.7.30'
+    implementation 'net.jcip:jcip-annotations:1.0'
+    implementation 'org.zeromq:jeromq:0.5.2'
+    compileOnly 'org.fusesource.leveldbjni:leveldbjni-all:1.8'
+    compileOnly "javax.annotation:javax.annotation-api:$javaxAnnotationVersion"
+    compileOnly "javax.inject:javax.inject:1"
+    compileOnly "org.projectlombok:lombok:$lombokVersion"
+    testImplementation 'junit:junit:4.13'
+    testImplementation 'org.easymock:easymock:3.2'
+    testImplementation 'com.fasterxml.jackson.core:jackson-databind:2.5.2'
+    testImplementation 'org.slf4j:slf4j-jdk14:1.7.30'
+    testImplementation 'com.h2database:h2:1.3.167'
+    testImplementation 'org.fusesource.leveldbjni:leveldbjni-all:1.8'
+}
+
+sourceCompatibility = 1.10
+compileJava.options.encoding = 'UTF-8'
+compileTestJava.options.encoding = 'UTF-8'
+
+
+    sourceSets.main.java.srcDirs += [
+        'build/generated/source/proto/main/grpc',
+        'build/generated/source/proto/main/java'
+    ]
+
+
+
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+protobuf {
+    protoc { artifact = "com.google.protobuf:protoc:${protobufVersion}" }
+    plugins { grpc { artifact = "io.grpc:protoc-gen-grpc-java:${grpcVersion}" } }
+    generateProtoTasks { ofSourceSet('main')*.plugins { grpc { } } }
+}
+
+artifacts {
+    archives sourcesJar
+}
+
