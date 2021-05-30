@@ -9,4 +9,8 @@
 
 [misqWalletRpc4](https://github.com/jmacxx/misq_prj52_WIP/tree/master/misqWalletRpc4) : updated code to use electrum for multiple users signing PSBT funding tx (Electrum 4.1)
 
+[lndWalletDemo](https://github.com/jmacxx/misq_prj52_WIP/tree/master/lndWalletDemo) : simple demo of using LND GRPC API
+
+[misqWalletRpc5](https://github.com/jmacxx/misq_prj52_WIP/tree/master/misqWalletRpc5) : add LND to supported wallets
+
 
