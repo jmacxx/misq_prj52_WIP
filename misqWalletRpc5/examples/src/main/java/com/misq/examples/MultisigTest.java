@@ -180,8 +180,37 @@ public class MultisigTest {
         }
     }
 
+    /*
+    70736274ff
+    01007c
+    0200000002d52227ead4ce8f97b82379
+    221bc885ebb6cbbde489953200c0e5c6
+    0ee669b7a10000000000feffffff48fa
+    d28a9fcbab9eea48cd8cf0603c089ed9
+    ddcbfa5810a97a1e66a688f7b5b80100
+    000000feffffff012052a60000000000
+    17a9146c838e79c5207a9fa43f618beb
+    77b9b42d76d8a48700000000
+    00
+    0107
+    00
+    0108
+    6b
+    024730440220430274e09d4f15c91c77
+    aec0a04fd8925f38470c09834a0eda3a
+    41ddbac1682302203173a1fbb25a0a4d
+    6a04fff4faea1985cd3a04cd0ce99b05
+    1e2f6089d1248ba401210219219ca469
+    d4c90074d265a3ce3c8f3436dea66405
+    1be39b8a45005e8ca14ea1
+    00
+    0000
+     */
     String extractTxFromPsbt(String psbt) {
         buffer = b64decode(psbt);
+        cursor = 0;
+        String psbtAsHex = dumpMemoryBlock(buffer.length);
+        System.out.println(psbtAsHex);
         cursor = 0;
         cursor = seekPastPsbtMagic(buffer, cursor);
         String dummy = dumpMemoryBlock(1);
@@ -194,7 +223,6 @@ public class MultisigTest {
             if (sectionLength > 0) {
                 sectionData = dumpMemoryBlock((int) sectionLength);
                 long blockEndDummy = readVarInt();
-                blockEndDummy = readVarInt();    // TODO
                 if (blockEndDummy != 0) {
                     return "FAIL BLOCKENDDUMMY != 0";
                 }
@@ -211,6 +239,9 @@ public class MultisigTest {
 
     String extractSignatureFromPsbt(String psbt) {
         buffer = b64decode(psbt);
+        cursor = 0;
+        String psbtAsHex = dumpMemoryBlock(buffer.length);
+        System.out.println(psbtAsHex);
         cursor = 0;
         cursor = seekPastPsbtMagic(buffer, cursor);
         String dummy = dumpMemoryBlock(1);
@@ -311,12 +342,12 @@ public class MultisigTest {
         // experiment 4 : get funds from alice & bob, spend them into a new address
         alice.listUnspent().whenComplete((aliceUnspent, ex1) -> {
             bob.listUnspent().whenComplete((bobUnspent, ex2) -> {
-                String addr = "2N38zZiAx3uVob9KULWCpH2uPtRAqTasyXn"; // TODO: hardcoded from bitcoin core
+                String addr = "2N38zZiAx3uVob9KULWCpH2uPtRAqTasyXn"; // TODO: hardcoded output address
                 List<Utxo> inputs = new ArrayList<>();
                 inputs.add(aliceUnspent.get(0));
                 inputs.add(bobUnspent.get(0));
                 List<Utxo> outputs = new ArrayList<>();
-                outputs.add(new Utxo().initForSpending(addr, "0.109"));
+                outputs.add(new Utxo().initForSpending(addr, "0.03999"));       // TODO: hardcoded output value
                 alice.createRawTransaction(inputs, outputs).whenComplete((psbtAlice, b) -> {
                     System.out.println("Alice signed tx: " + psbtAlice);
                     bob.createRawTransaction(inputs, outputs).whenComplete((psbtBob, c) -> {
@@ -324,7 +355,7 @@ public class MultisigTest {
                         String txUnsigned = extractTxFromPsbt(psbtAlice);
                         String signatureAlice = extractSignatureFromPsbt(psbtAlice);
                         String signatureBob = extractSignatureFromPsbt(psbtBob);
-                        String signedTx = combineTxAndSignatures(txUnsigned, signatureBob, signatureAlice);
+                        String signedTx = combineTxAndSignatures(txUnsigned, signatureAlice, signatureBob); // TODO: signatureA and signatureB need to be ordered correctly in the tx witness
                         System.out.println("Complete tx: " + signedTx);
                         bob.broadcastTransaction(signedTx).whenComplete((txId, exBroadcast) -> {
                             System.out.println("Broadcasted txid: " + txId);

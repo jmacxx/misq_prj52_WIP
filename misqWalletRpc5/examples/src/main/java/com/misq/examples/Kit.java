@@ -8,6 +8,23 @@ import java.util.concurrent.*;
 
 public class Kit implements Wallet.Listener{
 
+    Kit() {
+        Wallet bitcoinWalletAlice = new com.misq.core.bitcoind.WalletImpl("alice").addListener(this);
+        Wallet bitcoinWalletBob = new com.misq.core.bitcoind.WalletImpl("bob").addListener(this);
+        Wallet electrumWalletAlice = new com.misq.core.electrumd.WalletImpl("test2_alice", "192.168.1.111", 17777).addListener(this);
+        Wallet electrumWalletBob = new com.misq.core.electrumd.WalletImpl("test2_bob", "127.0.0.1", 17778).addListener(this);
+        Wallet lndWallet = new com.misq.core.lnd.WalletImpl().addListener(this);
+        //Wallet litecoinWallet = new com.misq.core.litecoind.WalletImpl("test123").addListener(this);
+        //Wallet elementsWallet = new com.misq.core.elementsd.WalletImpl("test123").addListener(this);
+        //Wallet moneroWallet = new com.misq.core.monerod.WalletImpl("test124", "test124").addListener(this);
+        doWalletThings(bitcoinWalletAlice, bitcoinWalletBob);
+        doWalletThings(electrumWalletAlice, electrumWalletBob);
+        doWalletThings(lndWallet, null);
+        //doWalletThings(litecoinWallet, null);
+        //doWalletThings(elementsWallet, null);
+        //doWalletThings(moneroWallet, null);
+    }
+
     // wallet notifications
     @Override
     public void onNewChainHeight(Wallet wallet, Long height) {
@@ -16,23 +33,6 @@ public class Kit implements Wallet.Listener{
     @Override
     public void onBalanceChanged(Wallet wallet, String balance) {
         System.out.println(wallet.toString() + " ===> balance notification from wallet: " + balance + " " + wallet.getTokenName());
-    }
-
-    Kit() {
-        // open wallets and do some stuff
-        Wallet bitcoinWalletAlice = new com.misq.core.bitcoind.WalletImpl("alice").addListener(this);
-        Wallet bitcoinWalletBob = new com.misq.core.bitcoind.WalletImpl("bob").addListener(this);
-        Wallet lndWallet = new com.misq.core.lnd.WalletImpl().addListener(this);
-        //Wallet electrumWallet = new com.misq.core.electrumd.WalletImpl("test123").addListener(this);
-        //Wallet litecoinWallet = new com.misq.core.litecoind.WalletImpl("test123").addListener(this);
-        //Wallet elementsWallet = new com.misq.core.elementsd.WalletImpl("test123").addListener(this);
-        //Wallet moneroWallet = new com.misq.core.monerod.WalletImpl("test124", "test124").addListener(this);
-        doWalletThings(bitcoinWalletAlice, bitcoinWalletBob);
-        doWalletThings(lndWallet, null);
-        //doWalletThings(electrumWallet, electrumWalletBob);
-        //doWalletThings(litecoinWallet, null);
-        //doWalletThings(elementsWallet, null);
-        //doWalletThings(moneroWallet, null);
     }
 
     void doWalletThings(Wallet wallet, Wallet walletCounterparty) {
@@ -81,7 +81,7 @@ public class Kit implements Wallet.Listener{
         multisigTest.spendingFromTwoWalletsTest((com.misq.core.electrumd.WalletImpl)alice, (com.misq.core.electrumd.WalletImpl)bob);
         try {
             reportBalances(alice, bob);
-            multisigTest.setupMultisigKeys();
+/*            multisigTest.setupMultisigKeys();
             multisigTest.getFunding();
             multisigTest.createMultisig();
             multisigTest.createSignedDepositTx();
@@ -90,7 +90,7 @@ public class Kit implements Wallet.Listener{
             multisigTest.createSignedPayoutTx();
             multisigTest.payoutTxId = multisigTest.broadcastTx(multisigTest.signedPayoutTx);
             sleep(10);
-            reportBalances(alice, bob);
+*/            reportBalances(alice, bob);
         } catch (IOException ex) {
             System.out.println("EXCEPTION: " + ex.toString());
         }
